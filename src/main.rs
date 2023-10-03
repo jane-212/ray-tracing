@@ -13,6 +13,7 @@ mod interval;
 mod ray;
 mod sphere;
 mod vec3;
+mod materail;
 
 fn main() {
     let mut world = HittableList::new();
