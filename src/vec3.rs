@@ -1,8 +1,9 @@
 #![allow(unused)]
-use std::fmt::Display;
 use std::ops::{Add, AddAssign, Deref, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
-#[derive(Clone)]
+use rand::Rng;
+
+#[derive(Clone, Default)]
 pub struct Vec3 {
     e: [f64; 3],
 }
@@ -34,11 +35,51 @@ impl Vec3 {
         ret
     }
 
+    pub fn random_unit() -> Self {
+        Self::random_in_unit_shpere().unit()
+    }
+
+    pub fn random_in_unit_shpere() -> Self {
+        loop {
+            let p = Self::random_range(-1., 1.);
+            if p.length_squared() < 1. {
+                return p;
+            }
+        }
+    }
+
+    pub fn random_on_hemisphere(normal: &Self) -> Self {
+        let on_unit = Self::random_unit();
+        if on_unit.dot(normal) > 0. {
+            on_unit
+        } else {
+            -on_unit
+        }
+    }
+
     pub fn cross(&self, other: &Self) -> Self {
         Self::new(
             self.y() * other.z() - self.z() * other.y(),
             self.z() * other.x() - self.x() * other.z(),
             self.x() * other.y() - self.y() * other.x(),
+        )
+    }
+
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        Self::new(
+            rng.gen_range(0.0..1.),
+            rng.gen_range(0.0..1.),
+            rng.gen_range(0.0..1.),
+        )
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Self {
+        let mut rng = rand::thread_rng();
+        Self::new(
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
         )
     }
 
@@ -153,18 +194,6 @@ impl Div<f64> for Vec3 {
 
         self /= rhs;
         self
-    }
-}
-
-impl Display for Vec3 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{} {} {}",
-            (self.e[0] * 255.999) as i32,
-            (self.e[1] * 255.999) as i32,
-            (self.e[2] * 255.999) as i32
-        )
     }
 }
 
